@@ -4,7 +4,6 @@ import sys
 class Planet(pygame.sprite.Sprite):
     def __init__(self, x, y, radius):
         super().__init__()
-        # gravity = ravity(x,y,self.radius)
         self.image = pygame.Surface((radius*2, radius*2), pygame.SRCALPHA)
         pygame.draw.circle(self.image, BLUE, (radius, radius), radius)
         self.rect = self.image.get_rect(center = (x,y))
