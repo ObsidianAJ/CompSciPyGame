@@ -2,25 +2,37 @@ import pygame
 import sys
 
 class Planet(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, radius):
         super().__init__()
-        self.radius = 50
-        # self.image = pygame.Surface((self.radius * 3, self.radius * 3), pygame.SRCALPHA)
-        # pygame.draw.circle(self.image, (0,0,150), (self.radius, self.radius), self.radius)
-        self.image = pygame.Surface((self.radius * 2, self.radius * 2), pygame.SRCALPHA)
-        pygame.draw.circle(self.image, BLUE, (self.radius, self.radius), self.radius)
-        self.rect = self.image.get_rect(topleft = (x,y))
+        # gravity = ravity(x,y,self.radius)
+        self.image = pygame.Surface((radius*2, radius*2), pygame.SRCALPHA)
+        pygame.draw.circle(self.image, BLUE, (radius, radius), radius)
+        self.rect = self.image.get_rect(center = (x,y))
+
         
-    def gravity(self):
-        pass
-        
+class Gravity(pygame.sprite.Sprite) :
+    def __init__(self,x ,y, radius):
+        super().__init__()
+        radius *= 2
+        self.image = pygame.surface.Surface((radius*2, radius*2), pygame.SRCALPHA)
+        pygame.draw.circle(self.image, (255,255,255), (radius, radius), radius)
+        self.rect = self.image.get_rect(center = (x,y))
+
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, color):
         super().__init__()
-        self.image = pygame.Surface((40, 40))
-        self.image.fill(color)
-        self.rect = self.image.get_rect(topleft = (x,y))
+        self.original_image = pygame.Surface((40, 40))
+        self.original_image.fill(color)
+        self.image = self.original_image
+        self.rect = self.image.get_rect(center = (x,y))
+        self.angle = 0
+
+    def aim(self, angle_delta):
+        self.angle += angle_delta
+        self.image = pygame.transform.rotate(self.original_image, self.angle)
+        self.rect = self.image.get_rect(center=self.rect.center)
+
 
     def move(self, deltax, deltay):
         if self.rect.left < 0 or self.rect.right>1200:
@@ -53,7 +65,17 @@ BLACK = (60,60,60)
 clock = pygame.time.Clock()
 
 planets = pygame.sprite.Group()
-planets.add(Planet(300, 300))
+planets.add(Planet(300, 300,70))
+
+gravity_zones = pygame.sprite.Group()
+gravity_zones.add(Gravity(300,300,70))
+
+player = Player(400,550,(250,25,250))
+
+all = pygame.sprite.Group()
+all.add(player)
+all.add(gravity_zones)
+all.add(planets)
 
 # Main game loop
 running = True
@@ -63,9 +85,15 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_a]:
+            player.aim(-5)
+        if keys[pygame.K_d]:
+            player.aim(5)
+
     # Fill the screen with a color (e.g., white)
     screen.fill(BLACK)
-    planets.draw(screen)
+    all.draw(screen)
 
 
 
