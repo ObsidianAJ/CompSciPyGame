@@ -5,8 +5,8 @@ class Planet(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
         self.radius = 50
-        # self.image = pygame.Surface((self.radius * 3, self.radius * 3), pygame.SRCALPHA)
-        # pygame.draw.circle(self.image, (0,0,150), (self.radius, self.radius), self.radius)
+        self.gravity = pygame.Surface((self.radius * 3, self.radius * 3), pygame.SRCALPHA)
+        pygame.draw.circle(self.gravity, (0,0,150), (self.radius, self.radius), self.radius)
         self.image = pygame.Surface((self.radius * 2, self.radius * 2), pygame.SRCALPHA)
         pygame.draw.circle(self.image, BLUE, (self.radius, self.radius), self.radius)
         self.rect = self.image.get_rect(topleft = (x,y))
