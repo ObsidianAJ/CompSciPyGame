@@ -1,5 +1,8 @@
+import math
 import pygame
 import sys
+alive = True
+
 
 class Planet(pygame.sprite.Sprite):
     def __init__(self, x, y, radius):
@@ -21,26 +24,36 @@ class Gravity(pygame.sprite.Sprite) :
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, color):
         super().__init__()
-        self.original_image = pygame.surface.Surface((100, 100), pygame.SRCALPHA)
-        pygame.draw.rect(self.original_image, color, (x,y,500,500))
+        self.x = x
+        self.y = y
+        self.original_image = pygame.surface.Surface((50, 50), pygame.SRCALPHA)
+        pygame.draw.rect(self.original_image, color, (0,0,50,50))
         self.image = self.original_image
-        self.rect = self.image.get_rect(center = (x+100,y+100))
+        self.rect = self.image.get_rect(center = (self.x,self.y))
         self.angle = 0
+        self.rise = 10
+        print(self.rect.topleft, self.rect.center)
 
     def aim(self, angle_delta):
-        self.angle += angle_delta
-        self.image = pygame.transform.rotate(self.original_image, self.angle)
-        self.rect = self.image.get_rect(center=self.rect.center)
+        if self.angle + angle_delta > 90 or self.angle + angle_delta < -90:
+            pass
+        else:
+            self.angle += angle_delta
+            self.image = pygame.transform.rotate(self.original_image, self.angle)
+            self.rect = self.image.get_rect(center=(self.x,self.y))
+            self.rect.center = (self.x,self.y)
+            print(self.rect.topleft, self.rect.center)
+            print(self.angle)
+        
 
 
-    def move(self, deltax, deltay):
-        if self.rect.left < 0 or self.rect.right>1200:
-            deltax *= -3
-        if self.rect.top < 0 or self.rect.bottom > 600:
-            deltay *= -3
-
-        self.rect.centerx += deltax
-        self.rect.centery += deltay
+    def move(self):
+        BULLET_SPEED = 5
+        angle_radians = math.radians(self.angle+90)
+        vx = BULLET_SPEED * math.cos(angle_radians)
+        vy = -BULLET_SPEED * math.sin(angle_radians) 
+        self.rect.centerx += vx
+        self.rect.centery += vy
 
 
 
@@ -67,14 +80,14 @@ planets = pygame.sprite.Group()
 planets.add(Planet(300, 300,70))
 
 gravity_zones = pygame.sprite.Group()
-gravity_zones.add(Gravity(300,300,70))
+gravity_zones.add(Gravity(300,300,90))
 
-player = Player(30,30,(250,25,250))
+player = Player(400,550,(250,0,0))
 
 all = pygame.sprite.Group()
-all.add(player)
 all.add(gravity_zones)
 all.add(planets)
+all.add(player)
 
 # Main game loop
 running = True
@@ -85,14 +98,20 @@ while running:
             running = False
 
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_a]:
-            player.aim(-5)
         if keys[pygame.K_d]:
+            player.aim(-5)
+        if keys[pygame.K_a]:
             player.aim(5)
+        if keys[pygame.K_SPACE]:
+            player.move()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            # event.pos contains the (x, y) coordinates of the click
+            print(f"Mouse clicked at coordinates: {event.pos}")
 
     # Fill the screen with a color (e.g., white)
     screen.fill(BLACK)
     all.draw(screen)
+
 
 
 
