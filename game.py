@@ -21,10 +21,10 @@ class Gravity(pygame.sprite.Sprite) :
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, color):
         super().__init__()
-        self.original_image = pygame.Surface((40, 40))
-        self.original_image.fill(color)
+        self.original_image = pygame.surface.Surface((100, 100), pygame.SRCALPHA)
+        pygame.draw.rect(self.original_image, color, (x,y,500,500))
         self.image = self.original_image
-        self.rect = self.image.get_rect(center = (x,y))
+        self.rect = self.image.get_rect(center = (x+100,y+100))
         self.angle = 0
 
     def aim(self, angle_delta):
@@ -69,7 +69,7 @@ planets.add(Planet(300, 300,70))
 gravity_zones = pygame.sprite.Group()
 gravity_zones.add(Gravity(300,300,70))
 
-player = Player(400,550,(250,25,250))
+player = Player(30,30,(250,25,250))
 
 all = pygame.sprite.Group()
 all.add(player)
