@@ -153,10 +153,10 @@ while running:
         if abs(angle_diff) > rotation_speed:
             if angle_diff > 0:
                 # player.angle += rotation_speed
-                player.aim(player.angle+rotation_speed)
+                player.aim(-1)
             else:
                 # player.angle -= rotation_speed
-                player.aim(player.angle-rotation_speed)
+                player.aim(+1)
         else:
             # If the difference is very small, just set it to the target angle to avoid jittering
             player.angle = target_angle_deg
