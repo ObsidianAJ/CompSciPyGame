@@ -30,7 +30,6 @@ class Player(pygame.sprite.Sprite):
         self.centery = y
         self.vx = 0 
         self.vy = 0 
-        self.rot_angle = 0
         self.original_image = pygame.surface.Surface((50, 50), pygame.SRCALPHA)
         pygame.draw.rect(self.original_image, color, (0,0,50,50))
         self.image = self.original_image
@@ -41,16 +40,23 @@ class Player(pygame.sprite.Sprite):
 
     def aim(self, angle_delta):
         self.angle += angle_delta
-        self.rotate(angle_delta)
+        self.image = pygame.transform.rotate(self.original_image, self.angle)    
+        self.rect = self.image.get_rect(center=(self.centerx,self.centery))
+        self.rect.center = (self.centerx,self.centery)
 
 
     def rotate(self, angle_delta): 
-        self.rot_angle += angle_delta   
-        self.image = pygame.transform.rotate(self.original_image, self.rot_angle)    
+        self.rotate_angle = angle_delta   
+        self.image = pygame.transform.rotate(self.original_image, self.rotate_angle)    
         self.rect = self.image.get_rect(center=(self.centerx,self.centery))
         self.rect.center = (self.centerx,self.centery)
         
-
+    def face_direction(self):
+        if self.vx == 0 and self.vy == 0:
+            return
+        heading_angle = math.degrees(math.atan2(-self.vy, self.vx)) - 90
+        self.angle = heading_angle
+        self.rotate(heading_angle)
 
     def move(self):
         self.rect.centerx += self.vx
@@ -126,7 +132,7 @@ while running:
                 angle_radians = math.radians(player.angle+90)
                 player.vx = BULLET_SPEED * math.cos(angle_radians)
                 player.vy = -BULLET_SPEED * math.sin(angle_radians)
-    if moving == True:
+    if moving:
         player.move()
 
     collisions = pygame.sprite.spritecollide(player, planets, False, pygame.sprite.collide_mask)
@@ -144,11 +150,9 @@ while running:
             G_CONSTANT = 0.15
             player.vx += (dx / distance) * G_CONSTANT
             player.vy += (dy / distance) * G_CONSTANT
-            player.rotate((player.vy/player.vx)/10)
+            player.face_direction()
         
 
-        # Keep the angle within a standard range if needed
-        player.angle %= 360
         if player.rect.colliderect(win_zone.rect):
             moving = False
 
